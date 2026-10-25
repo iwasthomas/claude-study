@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>프로필 | 개발자 소개</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { DEFAULT: '#c30452', dark: '#1a1a1a', soft: '#3a3a3a' }
+          },
+          fontFamily: {
+            display: ['"Black Han Sans"', 'sans-serif'],
+            body: ['"Noto Sans KR"', 'sans-serif']
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="font-body bg-white text-zinc-900 antialiased">
+
+  <!-- 헤더 네비게이션 -->
+  <header id="header" class="fixed inset-x-0 top-0 z-50 bg-white/95 backdrop-blur transition-shadow">
+    <nav class="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
+      <a href="#hero" class="font-display text-xl text-brand">MY PROFILE</a>
+
+      <ul class="hidden gap-8 text-sm font-medium md:flex">
+        <li><a href="#about" class="nav-link">소개</a></li>
+        <li><a href="#skills" class="nav-link">기술</a></li>
+        <li><a href="#projects" class="nav-link">프로젝트</a></li>
+        <li><a href="#contact" class="nav-link">연락처</a></li>
+      </ul>
+
+      <button id="menu-btn" class="flex h-10 w-10 items-center justify-center rounded md:hidden" aria-label="메뉴 열기">
+        <span class="block h-0.5 w-6 bg-zinc-900"></span>
+      </button>
+    </nav>
+
+    <!-- 모바일 메뉴 -->
+    <ul id="mobile-menu" class="hidden border-t border-zinc-200 bg-white px-4 py-2 md:hidden">
+      <li><a href="#about" class="block py-3 text-sm font-medium">소개</a></li>
+      <li><a href="#skills" class="block py-3 text-sm font-medium">기술</a></li>
+      <li><a href="#projects" class="block py-3 text-sm font-medium">프로젝트</a></li>
+      <li><a href="#contact" class="block py-3 text-sm font-medium">연락처</a></li>
+    </ul>
+  </header>
+
+  <main>
+    <!-- Hero (어두운 풀폭 + 핀스트라이프) -->
+    <section id="hero" class="pinstripe relative overflow-hidden bg-brand-dark pt-16 text-white">
+      <div class="mx-auto grid max-w-6xl items-center gap-10 px-4 py-20 md:grid-cols-[1fr_auto] md:py-28">
+        <div>
+          <p id="hero-role" class="text-sm font-bold text-brand"></p>
+          <h1 class="mt-3 font-display text-5xl md:text-7xl">
+            <span id="hero-name"></span>
+          </h1>
+          <p id="hero-name-en" class="mt-2 text-sm font-bold tracking-widest text-zinc-300"></p>
+          <p id="hero-intro" class="mt-6 max-w-md whitespace-pre-line leading-relaxed text-zinc-300"></p>
+
+          <div class="mt-8 flex gap-3">
+            <a href="#projects" class="rounded bg-brand px-6 py-3 text-sm font-bold transition hover:bg-brand/80">프로젝트 보기</a>
+            <a href="#contact" class="rounded border border-white/60 px-6 py-3 text-sm font-bold transition hover:bg-white hover:text-brand-dark">연락하기</a>
+          </div>
+        </div>
+
+        <!-- 정보 패널 -->
+        <dl id="info-panel" class="w-full max-w-sm divide-y divide-white/10 border-l-2 border-brand bg-black/40 backdrop-blur md:w-80"></dl>
+      </div>
+    </section>
+
+    <!-- 스탯 바 -->
+    <section class="border-b border-zinc-200">
+      <ul id="stats" class="mx-auto grid max-w-6xl grid-cols-2 divide-x divide-zinc-200 px-4 md:grid-cols-4"></ul>
+    </section>
+
+    <!-- 소개 (탭) -->
+    <section id="about" class="mx-auto max-w-6xl px-4 py-20">
+      <h2 class="section-title">ABOUT</h2>
+
+      <div class="mt-8 flex gap-2 border-b border-zinc-200">
+        <button data-tab="intro" class="tab-btn tab-active">소개</button>
+        <button data-tab="career" class="tab-btn">경력</button>
+      </div>
+
+      <div id="tab-intro" class="tab-panel mt-8 max-w-3xl whitespace-pre-line leading-relaxed text-zinc-700"></div>
+      <ul id="tab-career" class="tab-panel mt-8 hidden space-y-6"></ul>
+    </section>
+
+    <!-- 기술 스택 -->
+    <section id="skills" class="bg-zinc-50 py-20">
+      <div class="mx-auto max-w-6xl px-4">
+        <h2 class="section-title">SKILLS</h2>
+
+        <div class="mt-10 overflow-hidden rounded-lg border border-zinc-200 bg-white">
+          <table class="w-full text-center text-sm">
+            <thead class="bg-zinc-100 text-zinc-600">
+              <tr>
+                <th class="px-4 py-3 font-bold">기술</th>
+                <th class="px-4 py-3 font-bold">분류</th>
+                <th class="px-4 py-3 font-bold">숙련도</th>
+              </tr>
+            </thead>
+            <tbody id="skills-body" class="divide-y divide-zinc-200"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 프로젝트 (카드 3개) -->
+    <section id="projects" class="mx-auto max-w-6xl px-4 py-20">
+      <div class="flex items-end justify-between">
+        <h2 class="section-title">PROJECTS</h2>
+        <a href="https://github.com/your-id" target="_blank" rel="noopener" class="text-sm font-bold text-brand hover:underline">전체 보기 &gt;</a>
+      </div>
+
+      <div id="project-grid" class="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3"></div>
+    </section>
+
+    <!-- 연락처 -->
+    <section id="contact" class="bg-zinc-50 py-20">
+      <div class="mx-auto max-w-6xl px-4 text-center">
+        <h2 class="section-title justify-center">CONTACT</h2>
+        <p class="mt-4 text-zinc-600">새로운 기회나 협업 제안은 언제든 환영합니다.</p>
+
+        <div class="mt-8 flex flex-wrap justify-center gap-3">
+          <a id="contact-email" href="#" class="rounded bg-brand px-6 py-3 text-sm font-bold transition hover:bg-brand/80">이메일 보내기</a>
+          <a id="contact-github" href="#" target="_blank" rel="noopener" class="rounded border border-zinc-900 px-6 py-3 text-sm font-bold transition hover:bg-zinc-900 hover:text-white">GitHub</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 푸터 -->
+  <footer class="pinstripe bg-brand-dark py-8 text-center text-sm text-zinc-400">
+    <p>&copy; <span id="year"></span> <span id="footer-name"></span>. All rights reserved.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
