@@ -38,7 +38,12 @@ export function ThemeToggle() {
       flushSync(() => setTheme(next))
     })
 
-    await transition.ready
+    // 탭이 백그라운드이거나 연타로 전환이 건너뛰어지면 ready가 reject됩니다.
+    try {
+      await transition.ready
+    } catch {
+      return
+    }
     document.documentElement.animate(
       { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${endRadius}px at ${x}px ${y}px)`] },
       {
@@ -50,7 +55,7 @@ export function ThemeToggle() {
   }
 
   return (
-    <Button variant="ghost" size="icon" aria-label="테마 변경" onClick={handleClick}>
+    <Button variant="ghost" size="icon" aria-label="라이트/다크 모드 전환" onClick={handleClick}>
       {/* 아이콘은 CSS로만 전환해 SSR/하이드레이션 불일치를 피합니다. */}
       <Sun className="size-4 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
       <Moon className="absolute size-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
