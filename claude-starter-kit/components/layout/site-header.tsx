@@ -3,6 +3,7 @@ import Link from "next/link"
 import { Logo } from "@/components/common/logo"
 import { ThemeToggle } from "@/components/common/theme-toggle"
 import { Container } from "@/components/layout/container"
+import { LoginButton } from "@/components/layout/login-button"
 import { MobileNav } from "@/components/layout/mobile-nav"
 import { SampleMenu } from "@/components/layout/sample-menu"
 import { siteConfig } from "@/config/site"
@@ -31,6 +32,7 @@ export function SiteHeader() {
 
         <div className="flex items-center gap-1">
           <ThemeToggle />
+          <LoginButton />
         </div>
       </Container>
     </header>
