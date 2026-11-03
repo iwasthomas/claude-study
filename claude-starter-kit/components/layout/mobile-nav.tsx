@@ -33,6 +33,17 @@ export function MobileNav() {
               {item.title}
             </Link>
           ))}
+          <p className="text-muted-foreground px-3 pt-3 pb-1 text-xs font-medium">샘플</p>
+          {siteConfig.sampleNav.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={() => setOpen(false)}
+              className="hover:bg-muted rounded-md px-3 py-2 pl-6 text-sm font-medium"
+            >
+              {item.title}
+            </Link>
+          ))}
         </nav>
       </SheetContent>
     </Sheet>
