@@ -14,6 +14,7 @@ export function LoginButton() {
           <Button
             variant="outline"
             size="sm"
+            aria-label="로그인 (샘플 페이지)"
             nativeButton={false}
             render={<Link href="/login" />}
           />

@@ -44,13 +44,15 @@ export function MobileNav() {
               {item.title}
             </Link>
           ))}
-          <Link
-            href="/login"
-            onClick={() => setOpen(false)}
-            className="hover:bg-muted mt-2 rounded-md border-t px-3 py-2 pt-3 text-sm font-medium"
-          >
-            로그인 <span className="text-muted-foreground text-xs">(샘플)</span>
-          </Link>
+          <div className="mt-2 border-t pt-2">
+            <Link
+              href="/login"
+              onClick={() => setOpen(false)}
+              className="hover:bg-muted block rounded-md px-3 py-2 text-sm font-medium"
+            >
+              로그인 <span className="text-muted-foreground text-xs">(샘플)</span>
+            </Link>
+          </div>
         </nav>
       </SheetContent>
     </Sheet>

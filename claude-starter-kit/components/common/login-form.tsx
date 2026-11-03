@@ -24,7 +24,7 @@ export function LoginForm() {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="grid gap-5">
-          <FormField id="email" label="이메일">
+          <FormField id="email" label="이메일" required>
             <Input
               id="email"
               name="email"
@@ -34,7 +34,7 @@ export function LoginForm() {
               required
             />
           </FormField>
-          <FormField id="password" label="비밀번호">
+          <FormField id="password" label="비밀번호" required>
             <Input
               id="password"
               name="password"
