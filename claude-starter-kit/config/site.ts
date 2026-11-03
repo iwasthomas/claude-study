@@ -12,6 +12,10 @@ export const siteConfig = {
   nav: [
     { title: "홈", href: "/" },
     { title: "대시보드", href: "/dashboard" },
+    { title: "버튼", href: "/examples/buttons" },
+    { title: "컨트롤", href: "/examples/controls" },
+    { title: "그리드", href: "/examples/grid" },
+    { title: "레이아웃", href: "/examples/layouts" },
   ] satisfies NavItem[],
 }
 
