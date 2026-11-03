@@ -17,13 +17,14 @@ export function Hero() {
           레이아웃, 테마, 공통 컴포넌트가 준비되어 있어 바로 기능 개발에 집중할 수 있습니다.
         </p>
         <div className="flex flex-wrap justify-center gap-3">
-          <Button size="lg" render={<Link href="/dashboard" />}>
+          <Button size="lg" nativeButton={false} render={<Link href="/dashboard" />}>
             대시보드 보기
             <ArrowRight />
           </Button>
           <Button
             size="lg"
             variant="outline"
+            nativeButton={false}
             render={<a href="https://ui.shadcn.com" target="_blank" rel="noreferrer" />}
           >
             shadcn/ui 문서
