@@ -1,23 +1,20 @@
 "use client"
 
-import type { MouseEvent } from "react"
 import { flushSync } from "react-dom"
 import { useTheme } from "next-themes"
 import { Moon, Sun } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 
-const TRANSITION_DURATION = 500
-
 /**
  * 클릭하면 라이트/다크 모드를 전환하는 버튼.
- * View Transitions를 지원하면 클릭한 위치에서 원이 퍼지며 전환하고,
+ * View Transitions를 지원하면 화면 전체가 부드럽게 크로스페이드되고(globals.css),
  * 미지원이거나 모션 줄이기 설정이면 즉시 전환합니다.
  */
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme()
 
-  async function handleClick(event: MouseEvent<HTMLButtonElement>) {
+  function handleClick() {
     const next = resolvedTheme === "dark" ? "light" : "dark"
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
 
@@ -26,32 +23,9 @@ export function ThemeToggle() {
       return
     }
 
-    const rect = event.currentTarget.getBoundingClientRect()
-    const x = rect.left + rect.width / 2
-    const y = rect.top + rect.height / 2
-    const endRadius = Math.hypot(
-      Math.max(x, window.innerWidth - x),
-      Math.max(y, window.innerHeight - y)
-    )
-
-    const transition = document.startViewTransition(() => {
+    document.startViewTransition(() => {
       flushSync(() => setTheme(next))
     })
-
-    // 탭이 백그라운드이거나 연타로 전환이 건너뛰어지면 ready가 reject됩니다.
-    try {
-      await transition.ready
-    } catch {
-      return
-    }
-    document.documentElement.animate(
-      { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${endRadius}px at ${x}px ${y}px)`] },
-      {
-        duration: TRANSITION_DURATION,
-        easing: "ease-in-out",
-        pseudoElement: "::view-transition-new(root)",
-      }
-    )
   }
 
   return (
