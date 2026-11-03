@@ -128,3 +128,18 @@
     @apply font-sans;
   }
 }
+
+/* 테마 전환: 기본 크로스페이드를 끄고 theme-toggle.tsx에서 원형 확장 애니메이션을 직접 적용합니다. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 0;
+}
+
+::view-transition-new(root) {
+  z-index: 1;
+}
