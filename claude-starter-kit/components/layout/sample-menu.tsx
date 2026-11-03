@@ -23,7 +23,8 @@ export function SampleMenu() {
         샘플
         <ChevronDown className="size-3.5" aria-hidden />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="center" className="w-40">
+      {/* 팝업 여백(p-1) + 항목 여백(px-1.5) = 10px만큼 당겨 "샘플" 글자와 항목 글자의 왼쪽을 맞춥니다. */}
+      <DropdownMenuContent align="start" alignOffset={-10} className="w-40">
         {siteConfig.sampleNav.map((item) => (
           <DropdownMenuItem key={item.href} render={<Link href={item.href} />}>
             {item.title}
