@@ -6,3 +6,5 @@ package-lock.json
 next-env.d.ts
 public
 AGENTS.md
+.claude
+.mcp.json
