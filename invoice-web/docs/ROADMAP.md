@@ -41,7 +41,8 @@ Notion에서 `Status`를 `발행됨`으로 바꾸기만 하면 코드 수정·�
 
 - [x] 스타터킷 정리: 로그인/회원가입/랜딩 제거, 홈 자리표시 교체, `src/lib/env.ts`(Notion 환경 변수 스키마), `.env.example` 추가
 - [x] D-1(카테고리 MVP 포함), D-2(`id` 사용), D-3(`notion-to-md` + Markdown 렌더러) 결정
-- [ ] 패키지 설치: `@notionhq/client`, `notion-to-md`, `server-only` (설치 버전의 DB 조회 API가 `databases.query`인지 `dataSources.query`인지 확인해 기록)
+- [x] 패키지 설치: `@notionhq/client`, `notion-to-md`, `server-only` (설치 버전의 DB 조회 API가 `databases.query`인지 `dataSources.query`인지 확인해 기록)
+  - 설치 버전: `@notionhq/client` 5.31.1, `notion-to-md` 3.1.9. `Client.d.ts` 기준 `databases`에는 `query`가 없고 **`dataSources.query({ data_source_id, ... })`로 조회**한다 (`databases.retrieve`로 data source ID 확인 필요)
 - [ ] 라우트 골격: `src/app/posts/[id]/page.tsx`, `src/app/category/[name]/page.tsx`, `not-found.tsx`, `error.tsx`, `loading.tsx` (Next.js 15 규칙 `params: Promise<...>`)
 - [ ] Notion DB 생성(작성자 수동): `Title, Category, Tags, Published, Status(초안/발행됨)` 속성, Integration 생성 후 DB에 연결
 - [ ] `.env.local`에 `NOTION_API_KEY`, `NOTION_DATABASE_ID` 입력 (커밋 금지, `.gitignore` 확인)
