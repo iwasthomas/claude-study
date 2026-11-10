@@ -5,6 +5,7 @@ import { NotionToMarkdown } from 'notion-to-md'
 
 import { env } from '@/lib/env'
 import { notion } from '@/lib/notion/client'
+import { toPlainMarkdown } from '@/lib/notion/markdown'
 import { mapPageToSummary, mapPagesToSummaries } from '@/lib/notion/mapper'
 import type { PostDetail, PostSummary } from '@/lib/schemas/post'
 
@@ -139,7 +140,7 @@ export async function getPostById(id: string): Promise<PostDetail | null> {
   // 하위 블록과 100개 초과 블록 페이지네이션은 notion-to-md가 처리한다
   const n2m = new NotionToMarkdown({ notionClient: notion })
   const mdBlocks = await n2m.pageToMarkdown(page.id)
-  const content = n2m.toMarkdownString(mdBlocks).parent ?? ''
+  const content = toPlainMarkdown(n2m.toMarkdownString(mdBlocks).parent ?? '')
 
   return { ...summary, content }
 }
