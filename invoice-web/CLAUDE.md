@@ -25,7 +25,7 @@ npx shadcn@latest add <component>   # shadcn/ui 컴포넌트 추가
 ## 아키텍처
 
 - 레이아웃: `src/app/layout.tsx`(ThemeProvider, Toaster, `lang="ko"`, title 템플릿) → `components/layout/{header,footer,container}` + `components/navigation/*`.
-- 페이지: 홈 `src/app/page.tsx`(게시됨 글 목록, ISR 5분), 글 상세 `src/app/posts/[id]/page.tsx`(동적 렌더링, 없는 글·초안은 `notFound()`), 카테고리 `src/app/category/[name]/page.tsx`(ISR 5분, 없는 카테고리는 200 + 빈 상태). `loading/error/not-found.tsx`가 공통 상태 화면입니다.
+- 페이지: 홈 `src/app/page.tsx`(게시됨 글 목록, ISR 60초), 글 상세 `src/app/posts/[id]/page.tsx`(동적 렌더링, 없는 글·초안은 `notFound()`), 카테고리 `src/app/category/[name]/page.tsx`(ISR 60초, 없는 카테고리는 200 + 빈 상태). `loading/error/not-found.tsx`가 공통 상태 화면입니다.
 - **Notion 연동**은 `src/lib/notion/{client,mapper,posts}.ts`(모두 `server-only`)와 `src/lib/schemas/post.ts`(Zod 스키마)에 있습니다. API 2025-09-03의 data source 모델을 쓰므로 `databases.query`가 아니라 `databases.retrieve` → `dataSources.query` 순서입니다. Notion 호출은 서버에서만 하고 API 키가 클라이언트 번들에 들어가면 안 됩니다.
 - Status 값은 `초안` / `게시됨` 두 가지이며 필터는 `Status = 게시됨`입니다. 상태 용어는 이 두 가지로만 통일하고 다른 표현으로 바꿔 쓰지 않습니다(날짜 속성 `Published`는 별개).
 - **`src/lib/env.ts`**: `NOTION_API_KEY`, `NOTION_DATABASE_ID`를 Zod로 검증하며, **값이 없으면 import 시점에 throw**합니다. 서버 전용 모듈에서만 import하세요. 저장소에 `.env.example`은 없으므로 `.env.local`을 직접 만들어 두 값을 넣습니다(gitignore 대상).

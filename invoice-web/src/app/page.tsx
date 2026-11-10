@@ -2,8 +2,8 @@ import { Container } from '@/components/layout/container'
 import { PostList } from '@/components/posts/post-list'
 import { getPublishedPosts } from '@/lib/notion/posts'
 
-// D-4: 목록은 ISR, 5분마다 재검증
-export const revalidate = 300
+// D-4: 목록은 ISR, 60초마다 재검증
+export const revalidate = 60
 
 export default async function Home() {
   const posts = await getPublishedPosts()

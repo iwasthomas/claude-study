@@ -5,8 +5,8 @@ import { Container } from '@/components/layout/container'
 import { PostList } from '@/components/posts/post-list'
 import { getPostsByCategory } from '@/lib/notion/posts'
 
-// D-4: 목록 계열 페이지는 ISR 5분
-export const revalidate = 300
+// D-4: 목록 계열 페이지는 ISR 60초
+export const revalidate = 60
 
 interface CategoryPageProps {
   params: Promise<{ name: string }>

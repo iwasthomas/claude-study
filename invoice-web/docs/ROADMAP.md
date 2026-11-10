@@ -25,10 +25,10 @@ Notion에서 `Status`를 `게시됨`으로 바꾸기만 하면 코드 수정·�
 | D-1 | 카테고리 필터링(FR-006)의 MVP 포함 여부 | ✅ **MVP에 포함**                                       | 완료      |
 | D-2 | 글 상세 경로 식별자                     | ✅ **Notion `id` 사용** (Slug 속성 없음)                | 완료      |
 | D-3 | 본문 블록 렌더링 방식                   | ✅ **`notion-to-md` + Markdown 렌더러** (렌더러는 D-5)  | 완료      |
-| D-4 | 캐싱/재검증 주기                        | ✅ **목록 ISR 5분 + 글 상세 동적 렌더링**               | 완료      |
+| D-4 | 캐싱/재검증 주기                        | ✅ **목록 ISR 60초 + 글 상세 동적 렌더링**              | 완료      |
 | D-5 | Markdown 렌더러 패키지                  | ✅ **react-markdown + remark-gfm + rehype-pretty-code** | 완료      |
 
-**D-4 근거**: Notion 호스팅 이미지 URL은 S3 서명 URL(`X-Amz-Expires=3600`)이라 1시간 뒤 만료된다. 시간 기반 캐시는 방문이 뜸하면 만료된 URL이 담긴 캐시를 첫 방문자에게 먼저 보여 줄 수 있으므로, 이미지가 없는 목록(홈·카테고리)만 `revalidate = 300`으로 캐시하고 이미지가 있는 글 상세는 요청마다 Notion을 조회한다. 게시 후 목록 반영은 최대 5분이다.
+**D-4 근거**: Notion 호스팅 이미지 URL은 S3 서명 URL(`X-Amz-Expires=3600`)이라 1시간 뒤 만료된다. 시간 기반 캐시는 방문이 뜸하면 만료된 URL이 담긴 캐시를 첫 방문자에게 먼저 보여 줄 수 있으므로, 이미지가 없는 목록(홈·카테고리)만 `revalidate = 60`(당초 300초였으나 2026-11-10 배포 후 목록·상세 제목 불일치 체감으로 60초로 단축)으로 캐시하고 이미지가 있는 글 상세는 요청마다 Notion을 조회한다. 게시 후 목록 반영은 최대 약 1분이다.
 
 **D-5 근거**: `react-markdown` 10.1.0은 React 19(`react >=18`)와 호환된다. 코드 하이라이트는 `rehype-pretty-code`(shiki)로 서버에서 처리해 클라이언트 JS를 늘리지 않고, 라이트/다크 듀얼 테마로 다크모드(FR-005)를 맞춘다. `notion-to-md`가 코드 펜스 언어를 `plain text`(공백 포함)로 내보내므로 렌더러에서 언어 정규화가 필요하고, 이미지 alt는 캡션이 없으면 URL 인코딩된 파일명이 나오므로 디코딩하거나 비운다.
 
@@ -79,7 +79,7 @@ Notion에서 `Status`를 `게시됨`으로 바꾸기만 하면 코드 수정·�
 - [x] 데이터 계층: `src/lib/notion/posts.ts` — `getPublishedPosts`(게시됨 필터 + 발행일 내림차순 + `has_more` 페이지네이션), `getPostById`(초안·없는 글은 `null`), `getPostsByCategory`
 - [x] 응답 변환·검증: `src/lib/notion/mapper.ts` (Zod 검증 실패 글은 제외하고 서버 로그에 경고)
 - [x] 본문 변환: `notion-to-md`로 블록을 Markdown으로 변환 (하위 블록·페이지네이션 포함)
-- [x] **D-4 결정**: 목록 ISR 5분 + 글 상세 동적 렌더링 (Notion 이미지 URL 1시간 만료 근거, 위 결정 현황 참고). 실제 적용은 3단계 홈·상세 구현 때 `revalidate`/`dynamic` 설정으로 한다
+- [x] **D-4 결정**: 목록 ISR 60초(초기 5분에서 단축) + 글 상세 동적 렌더링 (Notion 이미지 URL 1시간 만료 근거, 위 결정 현황 참고). 실제 적용은 3단계 홈·상세 구현 때 `revalidate`/`dynamic` 설정으로 한다
 
 **공통 UI 모듈**
 
@@ -168,18 +168,20 @@ Notion에서 `Status`를 `게시됨`으로 바꾸기만 하면 코드 수정·�
 - [x] 미사용 의존성 정리 (2026-11-10): nextjs-app-developer 에이전트가 import 그래프를 전수 검사해 확실한 항목만 제거했다
   - **제거함**: `usehooks-ts`, `react-hook-form`, `@hookform/resolvers`, `@radix-ui/react-checkbox`, `@radix-ui/react-label`과 `ui/form.tsx`, `ui/label.tsx`, `ui/checkbox.tsx`. 폼·체크박스 기능이 없고 검색은 GET 폼으로 충분하며, 필요하면 `npx shadcn@latest add`로 복구한다
   - **보류**: `avatar`·`navigation-menu`·`progress`·`select`(radix 패키지와 ui 파일, 미사용이지만 사용 계획이 불명확), `sonner`(Toaster는 마운트됐으나 `toast()` 호출 0건), `shadcn` devDependency. `ui/input.tsx`·`alert.tsx`·`dialog.tsx`는 검색 UI 등에 쓸 수 있어 보존
-- [x] **발행일(Published) 정책 확정**: `Published`가 한국 시간(KST) 오늘보다 미래인 글은 숨긴다(예약 게시). 목록·카테고리는 Notion 필터 `Published on_or_before 오늘`, 상세는 직접 URL도 404. 목록은 ISR 5분 주기로 날짜가 바뀌면 노출된다
+- [x] **발행일(Published) 정책 확정**: `Published`가 한국 시간(KST) 오늘보다 미래인 글은 숨긴다(예약 게시). 목록·카테고리는 Notion 필터 `Published on_or_before 오늘`, 상세는 직접 URL도 404. 목록은 ISR 60초 주기로 날짜가 바뀌면 노출된다
 - [x] Notion 블록 타입 검증(콜아웃·토글·임베드·child_page)과 부모 DB 검사 분기 확인 (Shrimp P3-6)
   - **분석 결과(2026-11-10, 소스 분석 + 기존 글 2건 확인)**: 확인됨 — 문단·제목·불릿·코드(`plain text`→text)·이미지(S3→next/image). 소스상 지원 — 번호 목록·to_do·인용·표·구분선·synced_block. 부분 지원 — 콜아웃(인용으로 변환, 하위 블록 유실 가능)·북마크/임베드(링크 텍스트가 `bookmark`/`embed` 고정)·child_page(소제목으로 평탄화)·column(세로 나열)·수식(`$` 원문 노출)·video/file/pdf(서명 URL 만료). **미지원** — 토글·밑줄(`<details>`/`<u>` HTML이 rehype-raw 없이 깨짐), audio·table_of_contents 등(조용히 사라짐). 제안: 토글·밑줄을 custom transformer로 순수 Markdown 변환(rehype-raw 허용은 정책 변경이라 사용자 결정), 북마크/임베드 링크 텍스트를 URL·호스트명으로. 부모 DB 검사는 코드 리뷰상 올바르나 DB 밖 페이지가 없어 실행 검증은 미완료
   - **화면 검증 완료(테스트제목2, 2026-11-10)**: 토글(굵은 제목 + 본문)·밑줄(태그 제거)·콜아웃(인용 스타일)·북마크(호스트명 링크, 새 탭)·표·인용 정상. 후처리는 `src/lib/notion/markdown.ts`. **정책(확정)**: 수식은 사용하지 않아 **미지원**(`$$ … $$` 원문 노출), 밑줄 표시는 지원하지 않음. **알려진 한계**: 안쪽 내용이 없는 빈 토글은 notion-to-md가 통째로 생략한다. 부모 DB 검사 분기는 DB 밖 페이지가 없어 코드 리뷰로만 확인
-- [ ] Vercel 배포: 프로젝트 연결, `NOTION_API_KEY`, `NOTION_DATABASE_ID` 환경 변수 등록
+- [x] Vercel 배포: 프로젝트 연결, `NOTION_API_KEY`, `NOTION_DATABASE_ID` 환경 변수 등록
 
 ### 완료 기준
 
-- [ ] 배포 URL에서 360/768/1280px, 라이트/다크 최종 확인 (PRD 성공 지표 3)
-- [ ] 배포 환경에서 Notion 글 게시 → 코드 수정·재배포 없이 D-4 주기 내 반영 (PRD 성공 지표 1)
-- [ ] 배포 URL 대상 Playwright MCP E2E(3단계 시나리오 + 카테고리) 통과
-- [ ] `npm run check-all`, `npm run build` 통과, 콘솔 오류 없음
+- [x] 배포 URL에서 360/768/1280px, 라이트/다크 최종 확인 (PRD 성공 지표 3)
+- [x] 배포 환경에서 Notion 글 게시 → 코드 수정·재배포 없이 D-4 주기(60초) 내 반영 (PRD 성공 지표 1)
+- [x] 배포 URL 대상 Playwright MCP E2E(3단계 시나리오 + 카테고리) 통과
+- [x] `npm run check-all`, `npm run build` 통과, 콘솔 오류 없음
+
+> 배포 검증 결과 (https://claude-study-flax.vercel.app, 2026-11-10): 360/768/1280px × 라이트/다크 6조합 모두 가로 넘침 없음, 홈→상세(이미지 로드)→목록으로, 없는 글(noindex 안내)·없는 경로 404·없는 카테고리 빈 상태 통과. 콘솔 오류는 의도적으로 연 404 경로 요청 1건뿐. 클라이언트 JS 13개에서 Notion 키 패턴 없음. 상세 Lighthouse 99/100/100/91(SEO 91은 스트리밍 메타데이터 한계, 위 기록과 동일). Notion 제목 변경: 상세는 즉시, 홈은 만료 후 첫 요청 STALE → 이후 HIT로 반영 확인(Age 361→7). 이후 revalidate를 300→60초로 단축.
 
 ---
 
