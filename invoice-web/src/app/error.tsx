@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { Container } from '@/components/layout/container'
 import { Button } from '@/components/ui/button'
 
@@ -18,9 +19,12 @@ export default function ErrorPage({
         <p className="text-muted-foreground mt-4">
           잠시 후 다시 시도해 주세요.
         </p>
-        <Button onClick={reset} className="mt-6">
-          다시 시도
-        </Button>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Button onClick={reset}>다시 시도</Button>
+          <Button asChild variant="outline">
+            <Link href="/">홈으로 돌아가기</Link>
+          </Button>
+        </div>
       </section>
     </Container>
   )
