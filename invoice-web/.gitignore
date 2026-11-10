@@ -44,3 +44,7 @@ next-env.d.ts
 
 # shrimp task manager data
 .shrimp-data
+
+
+# playwright mcp artifacts
+.playwright-mcp
