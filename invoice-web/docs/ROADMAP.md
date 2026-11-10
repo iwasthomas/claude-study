@@ -165,11 +165,13 @@ Notion에서 `Status`를 `게시됨`으로 바꾸기만 하면 코드 수정·�
 - [x] 성능 점검: Lighthouse 성능·접근성 점수 기록(기준선 확보), 불필요한 클라이언트 번들 확인
   - **Lighthouse 기준선** (로컬 `npm run start`, 모바일 기본 설정, 2026-11-10): 홈 성능 96 · 접근성 100 · 권장사항 100 · SEO 100 / 글 상세 성능 95 · 접근성 100 · 권장사항 100 · SEO 91. 상세의 SEO 감점은 `meta-description` 하나로, 동적 페이지의 메타데이터가 스트리밍되어 `<body>`에 놓이기 때문이며(HTML에는 존재, 크롤러에는 head로 제공됨) 5단계 배포 후 실제 URL에서 재확인한다. LCP 3.0s는 개발용 로컬 측정이라 배포 후 재측정한다
   - First Load JS: 홈 168 kB, 글 상세 174 kB(공유 183 kB). `title` 템플릿은 `%s | 개발 블로그`로 적용(상세 `테스트제목 | 개발 블로그`)
-- [ ] 미사용 의존성 정리 검토 (`react-hook-form`, `@hookform/resolvers`, `@radix-ui/react-checkbox` 등, shadcn 컴포넌트 보존 여부 판단)
-  - **조사 결과(삭제하지 않음, 사용자 판단 대기)**: `usehooks-ts`는 Header 수정 후 어디서도 import되지 않아 제거 후보. `react-hook-form`, `@radix-ui/react-checkbox`는 shadcn 생성 컴포넌트(`ui/form.tsx`, `ui/checkbox.tsx`)에서만 쓰이고, `@hookform/resolvers`는 import가 없다. 폼 기능이 없으므로 의존성과 해당 ui 파일을 함께 정리할지 사용자 결정이 필요하다
-- [x] **결정 필요 — 발행일(Published) 정책**: 현재는 `Published`가 미래 날짜여도 `게시됨`이면 노출된다(테스트제목2는 초안이라 비노출). 미래 날짜 글을 숨길지(예약 게시) 그대로 노출할지 사용자 결정 후 `posts.ts` 필터에 반영- [ ] Notion 블록 타입 검증(콜아웃·토글·임베드·child_page)과 부모 DB 검사 분기 확인 (Shrimp P3-6, 사용자가 테스트 글에 블록을 추가해야 함. 이미지·표·코드 블록은 확인됨)
-- **분석 결과(2026-11-10, 소스 분석 + 기존 글 2건 확인)**: 확인됨 — 문단·제목·불릿·코드(`plain text`→text)·이미지(S3→next/image). 소스상 지원 — 번호 목록·to_do·인용·표·구분선·synced_block. 부분 지원 — 콜아웃(인용으로 변환, 하위 블록 유실 가능)·북마크/임베드(링크 텍스트가 `bookmark`/`embed` 고정)·child_page(소제목으로 평탄화)·column(세로 나열)·수식(`$` 원문 노출)·video/file/pdf(서명 URL 만료). **미지원** — 토글·밑줄(`<details>`/`<u>` HTML이 rehype-raw 없이 깨짐), audio·table_of_contents 등(조용히 사라짐). 제안: 토글·밑줄을 custom transformer로 순수 Markdown 변환(rehype-raw 허용은 정책 변경이라 사용자 결정), 북마크/임베드 링크 텍스트를 URL·호스트명으로. 부모 DB 검사는 코드 리뷰상 올바르나 DB 밖 페이지가 없어 실행 검증은 미완료
-- **화면 검증 완료(테스트제목2, 2026-11-10)**: 토글(굵은 제목 + 본문)·밑줄(태그 제거)·콜아웃(인용 스타일)·북마크(호스트명 링크, 새 탭)·표·인용 정상. 후처리는 `src/lib/notion/markdown.ts`. **정책(확정)**: 수식은 사용하지 않아 **미지원**(`$$ … $$` 원문 노출), 밑줄 표시는 지원하지 않음. **알려진 한계**: 안쪽 내용이 없는 빈 토글은 notion-to-md가 통째로 생략한다. 부모 DB 검사 분기는 DB 밖 페이지가 없어 코드 리뷰로만 확인
+- [x] 미사용 의존성 정리 (2026-11-10): nextjs-app-developer 에이전트가 import 그래프를 전수 검사해 확실한 항목만 제거했다
+  - **제거함**: `usehooks-ts`, `react-hook-form`, `@hookform/resolvers`, `@radix-ui/react-checkbox`, `@radix-ui/react-label`과 `ui/form.tsx`, `ui/label.tsx`, `ui/checkbox.tsx`. 폼·체크박스 기능이 없고 검색은 GET 폼으로 충분하며, 필요하면 `npx shadcn@latest add`로 복구한다
+  - **보류**: `avatar`·`navigation-menu`·`progress`·`select`(radix 패키지와 ui 파일, 미사용이지만 사용 계획이 불명확), `sonner`(Toaster는 마운트됐으나 `toast()` 호출 0건), `shadcn` devDependency. `ui/input.tsx`·`alert.tsx`·`dialog.tsx`는 검색 UI 등에 쓸 수 있어 보존
+- [x] **발행일(Published) 정책 확정**: `Published`가 한국 시간(KST) 오늘보다 미래인 글은 숨긴다(예약 게시). 목록·카테고리는 Notion 필터 `Published on_or_before 오늘`, 상세는 직접 URL도 404. 목록은 ISR 5분 주기로 날짜가 바뀌면 노출된다
+- [x] Notion 블록 타입 검증(콜아웃·토글·임베드·child_page)과 부모 DB 검사 분기 확인 (Shrimp P3-6)
+  - **분석 결과(2026-11-10, 소스 분석 + 기존 글 2건 확인)**: 확인됨 — 문단·제목·불릿·코드(`plain text`→text)·이미지(S3→next/image). 소스상 지원 — 번호 목록·to_do·인용·표·구분선·synced_block. 부분 지원 — 콜아웃(인용으로 변환, 하위 블록 유실 가능)·북마크/임베드(링크 텍스트가 `bookmark`/`embed` 고정)·child_page(소제목으로 평탄화)·column(세로 나열)·수식(`$` 원문 노출)·video/file/pdf(서명 URL 만료). **미지원** — 토글·밑줄(`<details>`/`<u>` HTML이 rehype-raw 없이 깨짐), audio·table_of_contents 등(조용히 사라짐). 제안: 토글·밑줄을 custom transformer로 순수 Markdown 변환(rehype-raw 허용은 정책 변경이라 사용자 결정), 북마크/임베드 링크 텍스트를 URL·호스트명으로. 부모 DB 검사는 코드 리뷰상 올바르나 DB 밖 페이지가 없어 실행 검증은 미완료
+  - **화면 검증 완료(테스트제목2, 2026-11-10)**: 토글(굵은 제목 + 본문)·밑줄(태그 제거)·콜아웃(인용 스타일)·북마크(호스트명 링크, 새 탭)·표·인용 정상. 후처리는 `src/lib/notion/markdown.ts`. **정책(확정)**: 수식은 사용하지 않아 **미지원**(`$$ … $$` 원문 노출), 밑줄 표시는 지원하지 않음. **알려진 한계**: 안쪽 내용이 없는 빈 토글은 notion-to-md가 통째로 생략한다. 부모 DB 검사 분기는 DB 밖 페이지가 없어 코드 리뷰로만 확인
 - [ ] Vercel 배포: 프로젝트 연결, `NOTION_API_KEY`, `NOTION_DATABASE_ID` 환경 변수 등록
 
 ### 완료 기준

@@ -30,7 +30,7 @@ npx shadcn@latest add <component>   # shadcn/ui 컴포넌트 추가
 - Status 값은 `초안` / `게시됨` 두 가지이며 필터는 `Status = 게시됨`입니다. 상태 용어는 이 두 가지로만 통일하고 다른 표현으로 바꿔 쓰지 않습니다(날짜 속성 `Published`는 별개).
 - **`src/lib/env.ts`**: `NOTION_API_KEY`, `NOTION_DATABASE_ID`를 Zod로 검증하며, **값이 없으면 import 시점에 throw**합니다. 서버 전용 모듈에서만 import하세요. 저장소에 `.env.example`은 없으므로 `.env.local`을 직접 만들어 두 값을 넣습니다(gitignore 대상).
 - 본문은 `notion-to-md`로 Markdown 문자열을 만들고 `components/posts/post-body.tsx`(react-markdown + remark-gfm + rehype-pretty-code/shiki, 원시 HTML 미허용)로 렌더링합니다. 본문 이미지는 Notion S3 URL(1시간 만료)이라 상세를 동적 렌더링하고 `next.config.ts`의 `remotePatterns`에 등록했습니다. 결정 이력은 ROADMAP D-1~D-5를 보세요.
-- `src/components/ui/*`는 shadcn/ui 생성 코드입니다(일부는 미사용이지만 의도적으로 보존). 직접 수정보다 `shadcn add`로 추가·갱신합니다.
+- `src/components/ui/*`는 shadcn/ui 생성 코드입니다(일부는 아직 쓰이지 않지만 향후 사용 가능성이 있어 보존, 미사용 의존성 정리 결과는 ROADMAP 5단계 참고). 직접 수정보다 `shadcn add`로 추가·갱신합니다.
 - 경로 별칭은 `@/*` → `src/*` 입니다.
 
 ## 저장소 환경 (비자명한 점)
