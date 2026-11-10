@@ -10,7 +10,7 @@ Notion에서 `Status`를 `게시됨`으로 바꾸기만 하면 코드 수정·�
 
 | 단계 | 이름           | 한 줄 요약                                       | 예상 소요 | 상태    |
 | ---- | -------------- | ------------------------------------------------ | --------- | ------- |
-| 1    | 프로젝트 골격  | 구조·환경 설정·외부 서비스(Notion) 준비          | 0.5~1일   | 🔄 진행 |
+| 1    | 프로젝트 골격  | 구조·환경 설정·외부 서비스(Notion) 준비          | 0.5~1일   | ✅ 완료 |
 | 2    | 공통 모듈      | 타입·Notion 클라이언트·데이터 계층·공통 UI       | 2~3일     | ⏳ 대기 |
 | 3    | 핵심 기능      | 글 목록(홈) + 글 상세 (블로그의 존재 이유)       | 1~2일     | ⏳ 대기 |
 | 4    | 추가 기능      | 카테고리 필터링 (MVP 포함 확정), 검색은 MVP 이후 | 1~1.5일   | ⏳ 대기 |
@@ -43,17 +43,17 @@ Notion에서 `Status`를 `게시됨`으로 바꾸기만 하면 코드 수정·�
 - [x] D-1(카테고리 MVP 포함), D-2(`id` 사용), D-3(`notion-to-md` + Markdown 렌더러) 결정
 - [x] 패키지 설치: `@notionhq/client`, `notion-to-md`, `server-only` (설치 버전의 DB 조회 API가 `databases.query`인지 `dataSources.query`인지 확인해 기록)
   - 설치 버전: `@notionhq/client` 5.31.1, `notion-to-md` 3.1.9. `Client.d.ts` 기준 `databases`에는 `query`가 없고 **`dataSources.query({ data_source_id, ... })`로 조회**한다 (`databases.retrieve`로 data source ID 확인 필요)
-- [ ] 라우트 골격: `src/app/posts/[id]/page.tsx`, `src/app/category/[name]/page.tsx`, `not-found.tsx`, `error.tsx`, `loading.tsx` (Next.js 15 규칙 `params: Promise<...>`)
-- [ ] Notion DB 생성(작성자 수동): `Title, Category, Tags, Published, Status(초안/게시됨)` 속성, Integration 생성 후 DB에 연결
-- [ ] `.env.local`에 `NOTION_API_KEY`, `NOTION_DATABASE_ID` 입력 (커밋 금지, `.gitignore` 확인)
-- [ ] 테스트용 글 3개 이상 작성: 게시됨 2개(발행일·카테고리 상이, 문단/제목/코드/목록/이미지 포함), 초안 1개
+- [x] 라우트 골격: `src/app/posts/[id]/page.tsx`, `src/app/category/[name]/page.tsx`, `not-found.tsx`, `error.tsx`, `loading.tsx` (Next.js 15 규칙 `params: Promise<...>`)
+- [x] Notion DB 생성(작성자 수동): `Title, Category, Tags, Published, Status(초안/게시됨)` 속성, Integration 생성 후 DB에 연결
+- [x] `.env.local`에 `NOTION_API_KEY`, `NOTION_DATABASE_ID` 입력 (커밋 금지, `.gitignore` 확인)
+- [x] 테스트용 글 3개 이상 작성: 게시됨 2개(발행일·카테고리 상이, 문단/제목/코드/목록/이미지 포함), 초안 1개
 
 ### 완료 기준
 
-- [ ] `npm run check-all`, `npm run build` 통과
-- [ ] `npm run dev`로 `/`, `/posts/임의값`, `/category/임의값`, 존재하지 않는 경로(404)가 헤더·푸터 레이아웃 안에서 열림
-- [ ] Notion Integration으로 DB 조회가 가능한 상태 (키·DB ID 유효)
-- [ ] `git status`에 `.env.local`이 나타나지 않음
+- [x] `npm run check-all`, `npm run build` 통과
+- [x] `npm run dev`로 `/`, `/posts/임의값`, `/category/임의값`, 존재하지 않는 경로(404)가 헤더·푸터 레이아웃 안에서 열림
+- [x] Notion Integration으로 DB 조회가 가능한 상태 (키·DB ID 유효)
+- [x] `git status`에 `.env.local`이 나타나지 않음
 
 ---
 
