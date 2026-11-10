@@ -120,3 +120,19 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* 본문 코드 블록: rehype-pretty-code(shiki) 듀얼 테마를 next-themes의 .dark 클래스에 연결 */
+.post-code-block,
+.post-code-block code span {
+  color: var(--shiki-light);
+}
+.post-code-block {
+  background-color: var(--shiki-light-bg, var(--muted));
+}
+.dark .post-code-block,
+.dark .post-code-block code span {
+  color: var(--shiki-dark);
+}
+.dark .post-code-block {
+  background-color: var(--shiki-dark-bg, var(--muted));
+}
