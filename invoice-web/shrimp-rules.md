@@ -36,7 +36,7 @@
 - **MUST** `@/lib/env`는 서버 전용 모듈에서만 import한다. 클라이언트 컴포넌트(`'use client'`)에서 import하면 안 된다.
 - **MUST** `NOTION_API_KEY`에 `NEXT_PUBLIC_` 접두사를 붙이지 않는다.
 - **MUST** `src/lib/notion/*` 파일 첫 줄에 `import 'server-only'`를 둔다.
-- 초안 글(`Status !== 발행됨`)은 목록과 상세 모두에서 제외한다. 초안/없는 글 ID는 `notFound()`로 처리한다.
+- 초안 글(`Status !== 게시됨`)은 목록과 상세 모두에서 제외한다. 초안/없는 글 ID는 `notFound()`로 처리한다.
 - Zod 검증에 실패한 Notion 글은 결과에서 제외하고 서버 로그에 경고를 남긴다.
 - 설치된 `@notionhq/client` 버전의 DB 조회 API(`databases.query` vs `dataSources.query`)를 확인한 뒤 코드를 작성하고, ROADMAP 1단계 항목에 결과를 기록한다.
 

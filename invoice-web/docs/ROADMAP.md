@@ -1,6 +1,6 @@
 # 개인 개발 블로그 개발 로드맵
 
-Notion에서 `Status`를 `발행됨`으로 바꾸기만 하면 코드 수정·재배포 없이 글이 반영되는 개인 기술 블로그.
+Notion에서 `Status`를 `게시됨`으로 바꾸기만 하면 코드 수정·재배포 없이 글이 반영되는 개인 기술 블로그.
 
 - 참조 문서: `docs/PRD.md`(요구사항), `CLAUDE.md`(스택·명령어), `docs/guides/*`(구조·패턴)
 - 기술 스택: Next.js 15.5.3 App Router, React 19, TypeScript 5, TailwindCSS v4, shadcn/ui, Zod, `@notionhq/client`, `notion-to-md`, Vercel
@@ -44,9 +44,9 @@ Notion에서 `Status`를 `발행됨`으로 바꾸기만 하면 코드 수정·�
 - [x] 패키지 설치: `@notionhq/client`, `notion-to-md`, `server-only` (설치 버전의 DB 조회 API가 `databases.query`인지 `dataSources.query`인지 확인해 기록)
   - 설치 버전: `@notionhq/client` 5.31.1, `notion-to-md` 3.1.9. `Client.d.ts` 기준 `databases`에는 `query`가 없고 **`dataSources.query({ data_source_id, ... })`로 조회**한다 (`databases.retrieve`로 data source ID 확인 필요)
 - [ ] 라우트 골격: `src/app/posts/[id]/page.tsx`, `src/app/category/[name]/page.tsx`, `not-found.tsx`, `error.tsx`, `loading.tsx` (Next.js 15 규칙 `params: Promise<...>`)
-- [ ] Notion DB 생성(작성자 수동): `Title, Category, Tags, Published, Status(초안/발행됨)` 속성, Integration 생성 후 DB에 연결
+- [ ] Notion DB 생성(작성자 수동): `Title, Category, Tags, Published, Status(초안/게시됨)` 속성, Integration 생성 후 DB에 연결
 - [ ] `.env.local`에 `NOTION_API_KEY`, `NOTION_DATABASE_ID` 입력 (커밋 금지, `.gitignore` 확인)
-- [ ] 테스트용 글 3개 이상 작성: 발행됨 2개(발행일·카테고리 상이, 문단/제목/코드/목록/이미지 포함), 초안 1개
+- [ ] 테스트용 글 3개 이상 작성: 게시됨 2개(발행일·카테고리 상이, 문단/제목/코드/목록/이미지 포함), 초안 1개
 
 ### 완료 기준
 
@@ -71,7 +71,7 @@ Notion에서 `Status`를 `발행됨`으로 바꾸기만 하면 코드 수정·�
 
 - [ ] 도메인 타입·Zod 스키마: `src/lib/schemas/post.ts` (`id, title, category, tags, published, status`, slug 필드 없음), `PostSummary`(목록)·`PostDetail`(본문은 Markdown 문자열) 구분
 - [ ] 서버 전용 Notion 클라이언트: `src/lib/notion/client.ts` (`import 'server-only'` + `env` 사용)
-- [ ] 데이터 계층: `src/lib/notion/posts.ts` — `getPublishedPosts`(발행됨 필터 + 발행일 내림차순 + `has_more` 페이지네이션), `getPostById`(초안·없는 글은 `null`), `getPostsByCategory`
+- [ ] 데이터 계층: `src/lib/notion/posts.ts` — `getPublishedPosts`(게시됨 필터 + 발행일 내림차순 + `has_more` 페이지네이션), `getPostById`(초안·없는 글은 `null`), `getPostsByCategory`
 - [ ] 응답 변환·검증: `src/lib/notion/mapper.ts` (Zod 검증 실패 글은 제외하고 서버 로그에 경고)
 - [ ] 본문 변환: `notion-to-md`로 블록을 Markdown으로 변환 (하위 블록·페이지네이션 포함)
 - [ ] ⚠️ **D-4 결정**: 캐싱/재검증 방식(시간 기반 ISR / 태그 기반 `revalidateTag` / 동적 렌더링)과 주기 결정. Notion 이미지 URL은 일정 시간 후 만료되므로 재검증 주기와 함께 판단
@@ -129,7 +129,7 @@ Notion에서 `Status`를 `발행됨`으로 바꾸기만 하면 코드 수정·�
 
 ### 작업
 
-- [ ] **카테고리별 글 목록 (FR-006, MVP)**: `src/app/category/[name]/page.tsx`, 카테고리 Badge를 링크화(`post-meta.tsx`), `Category` + `Status = 발행됨` 필터, 한글 카테고리명 URL 인코딩/디코딩, 없는 카테고리는 빈 상태 또는 404(정책 기록)
+- [ ] **카테고리별 글 목록 (FR-006, MVP)**: `src/app/category/[name]/page.tsx`, 카테고리 Badge를 링크화(`post-meta.tsx`), `Category` + `Status = 게시됨` 필터, 한글 카테고리명 URL 인코딩/디코딩, 없는 카테고리는 빈 상태 또는 404(정책 기록)
 - [ ] **제목 키워드 검색 (FR-007, MVP 이후)**: 검색 방식 선택·기록(Notion `title contains` vs 캐시된 목록에서 필터링), `src/app/search/page.tsx`, 헤더 검색 진입점, 결과 없음 상태
 
 ### 완료 기준
