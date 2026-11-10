@@ -107,20 +107,22 @@ Notion에서 `Status`를 `게시됨`으로 바꾸기만 하면 코드 수정·�
 
 ### 작업
 
-- [ ] 홈 글 목록 (FR-001, FR-002): Server Component에서 `getPublishedPosts` 호출, 0개일 때 빈 상태, D-4 재검증 설정 적용
-- [ ] 글 상세 (FR-001, FR-003): 제목·카테고리·태그·발행일·본문 표시, 없는 글·초안 글은 `notFound()`, `generateMetadata`로 글 제목을 `<title>`에 반영
-- [ ] 이미지 처리: 원격 이미지 도메인(`next.config.ts`) 설정, 이미지 URL 만료 대응 확인
-- [ ] 오류 처리: Notion 호출 실패 시 `error.tsx` 표시, 서버 프로세스 유지
-- [ ] 공통 상태 화면 다듬기 (2단계에서 이월): `not-found.tsx`, `error.tsx`, `loading.tsx`의 문구·스타일을 실데이터 화면 기준으로 정리
+- [x] 홈 글 목록 (FR-001, FR-002): Server Component에서 `getPublishedPosts` 호출, 0개일 때 빈 상태, D-4 재검증 설정 적용
+- [x] 글 상세 (FR-001, FR-003): 제목·카테고리·태그·발행일·본문 표시, 없는 글·초안 글은 `notFound()`, `generateMetadata`로 글 제목을 `<title>`에 반영
+- [x] 이미지 처리: 원격 이미지 도메인(`next.config.ts`) 설정, 이미지 URL 만료 대응 확인
+- [x] 오류 처리: Notion 호출 실패 시 `error.tsx` 표시, 서버 프로세스 유지
+- [x] 공통 상태 화면 다듬기 (2단계에서 이월): `not-found.tsx`, `error.tsx`, `loading.tsx`의 문구·스타일을 실데이터 화면 기준으로 정리
+- [ ] Notion 블록 타입·부모 DB 검사·실제 이미지 표시 검증 (콜아웃, 토글, 임베드, child_page, 표, 이미지): 연동에 공유된 페이지가 DB 안의 3건뿐이고 테스트 글에 해당 블록이 없어, 사용자가 Notion에 블록을 추가해야 확인 가능 (Shrimp P3-6)
+- 참고: 루트 `loading.tsx` 스트리밍 때문에 notFound 화면의 HTTP 상태는 200이다(`noindex`는 붙음). 5단계 SEO 점검에서 판단
 
 ### 완료 기준
 
-- [ ] 홈에 Notion의 **발행된 글만 최신순**으로 표시됨 (FR-002 인수 조건)
-- [ ] 홈 카드 클릭 → 상세에서 본문 표시, **2클릭 이내** (PRD 2절)
-- [ ] 초안 글 ID로 직접 접근 시 404, 잘못된 ID도 404 (FR-003 인수 조건)
+- [x] 홈에 Notion의 **게시됨 글만 최신순**으로 표시됨 (FR-002 인수 조건)
+- [x] 홈 카드 클릭 → 상세에서 본문 표시, **2클릭 이내** (PRD 2절)
+- [x] 초안 글 ID로 직접 접근 시 404, 잘못된 ID도 404 (FR-003 인수 조건)
 - [ ] Notion에서 `Status`를 바꾸면 D-4 주기 안에 반영됨
-- [ ] `npm run build` 후 `.next/static`에서 `NOTION_API_KEY` 값 검색 결과 0건, 브라우저 네트워크에서 Notion API 직접 호출 없음 (FR-001 인수 조건)
-- [ ] Playwright MCP 시나리오(홈 → 상세 → 뒤로가기, 404, 빈 상태) 통과
+- [x] `npm run build` 후 `.next/static`에서 `NOTION_API_KEY` 값 검색 결과 0건, 브라우저 네트워크에서 Notion API 직접 호출 없음 (FR-001 인수 조건)
+- [ ] Playwright MCP 시나리오: 홈 → 상세 → 뒤로가기, 초안 404 통과 (빈 상태는 게시됨 글이 0건인 상태를 만들 수 없어 미확인, 컴포넌트는 더미로 확인)
 
 ---
 
