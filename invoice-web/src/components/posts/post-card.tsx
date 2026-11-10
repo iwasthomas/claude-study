@@ -22,7 +22,7 @@ export function PostCard({ post, className }: PostCardProps) {
     >
       <Card className="group-hover:border-foreground/30 h-full gap-4 transition-[border-color,box-shadow] group-hover:shadow-md">
         <CardHeader>
-          <CardTitle className="line-clamp-3 text-lg leading-snug break-words">
+          <CardTitle className="line-clamp-3 text-lg leading-snug [overflow-wrap:anywhere] break-keep">
             {post.title}
           </CardTitle>
         </CardHeader>
