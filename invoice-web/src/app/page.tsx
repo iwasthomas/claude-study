@@ -1,11 +1,18 @@
 import { Container } from '@/components/layout/container'
+import { PostList } from '@/components/posts/post-list'
+import { getPublishedPosts } from '@/lib/notion/posts'
 
-export default function Home() {
+// D-4: 목록은 ISR, 5분마다 재검증
+export const revalidate = 300
+
+export default async function Home() {
+  const posts = await getPublishedPosts()
+
   return (
     <Container>
       <section className="py-12">
-        <h1 className="text-3xl font-bold tracking-tight">최근 글</h1>
-        <p className="text-muted-foreground mt-4">아직 발행된 글이 없습니다.</p>
+        <h1 className="mb-8 text-3xl font-bold tracking-tight">최근 글</h1>
+        <PostList posts={posts} />
       </section>
     </Container>
   )
