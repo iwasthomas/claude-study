@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars -- react-markdown이 넘기는 node prop을 DOM에 전달하지 않으려고 구조분해로 제거 */
 import type { ComponentProps } from 'react'
+import Image from 'next/image'
 import { MarkdownAsync } from 'react-markdown'
 import rehypePrettyCode from 'rehype-pretty-code'
 import remarkGfm from 'remark-gfm'
@@ -50,6 +51,21 @@ function normalizeAlt(alt: string | undefined): string {
     // 잘못된 인코딩은 원본 유지
   }
   return FILENAME_LIKE.test(decoded.trim()) ? '' : decoded
+}
+
+// next.config.ts의 images.remotePatterns와 같은 호스트
+const NOTION_IMAGE_HOSTS = new Set([
+  'prod-files-secure.s3.us-west-2.amazonaws.com',
+  'file.notion.so',
+])
+
+function isNotionImage(url: string): boolean {
+  try {
+    const u = new URL(url)
+    return u.protocol === 'https:' && NOTION_IMAGE_HOSTS.has(u.hostname)
+  } catch {
+    return false
+  }
 }
 
 const components: ComponentProps<typeof MarkdownAsync>['components'] = {
@@ -211,20 +227,36 @@ const components: ComponentProps<typeof MarkdownAsync>['components'] = {
   strong: ({ node: _node, className, ...props }) => (
     <strong className={cn('font-semibold', className)} {...props} />
   ),
-  // 이미지: 3단계(P3-3)에서 next/image와 원격 도메인 설정으로 교체 예정
-  img: ({ node: _node, className, src, alt }) => (
-    // eslint-disable-next-line @next/next/no-img-element -- Notion S3 URL은 1시간 후 만료되고 원격 도메인 설정이 P3-3 범위라 임시로 <img> 사용
-    <img
-      src={typeof src === 'string' ? src : undefined}
-      alt={normalizeAlt(alt)}
-      loading="lazy"
-      decoding="async"
-      className={cn(
-        'my-6 block h-auto max-w-full rounded-lg border',
-        className
-      )}
-    />
-  ),
+  // 이미지: Notion 호스트는 next/image(최적화), 그 외 외부 URL은 설정 없이도 깨지지 않도록 <img> 사용
+  img: ({ node: _node, className, src, alt }) => {
+    const url = typeof src === 'string' ? src : undefined
+    const imgClass = cn(
+      'my-6 block h-auto max-w-full rounded-lg border',
+      className
+    )
+    if (url && isNotionImage(url)) {
+      return (
+        <Image
+          src={url}
+          alt={normalizeAlt(alt)}
+          width={1200}
+          height={675}
+          sizes="(min-width: 768px) 672px, 100vw"
+          className={imgClass}
+        />
+      )
+    }
+    return (
+      // eslint-disable-next-line @next/next/no-img-element -- next.config에 등록되지 않은 외부 호스트
+      <img
+        src={url}
+        alt={normalizeAlt(alt)}
+        loading="lazy"
+        decoding="async"
+        className={imgClass}
+      />
+    )
+  },
 }
 
 export async function PostBody({ content, className }: PostBodyProps) {
