@@ -231,7 +231,7 @@ const components: ComponentProps<typeof MarkdownAsync>['components'] = {
   img: ({ node: _node, className, src, alt }) => {
     const url = typeof src === 'string' ? src : undefined
     const imgClass = cn(
-      'my-6 block h-auto max-w-full rounded-lg border',
+      'my-6 block h-auto w-auto max-w-full rounded-lg border',
       className
     )
     if (url && isNotionImage(url)) {
