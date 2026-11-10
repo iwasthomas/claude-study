@@ -167,6 +167,7 @@ Notion에서 `Status`를 `게시됨`으로 바꾸기만 하면 코드 수정·�
   - First Load JS: 홈 168 kB, 글 상세 174 kB(공유 183 kB). `title` 템플릿은 `%s | 개발 블로그`로 적용(상세 `테스트제목 | 개발 블로그`)
 - [ ] 미사용 의존성 정리 검토 (`react-hook-form`, `@hookform/resolvers`, `@radix-ui/react-checkbox` 등, shadcn 컴포넌트 보존 여부 판단)
   - **조사 결과(삭제하지 않음, 사용자 판단 대기)**: `usehooks-ts`는 Header 수정 후 어디서도 import되지 않아 제거 후보. `react-hook-form`, `@radix-ui/react-checkbox`는 shadcn 생성 컴포넌트(`ui/form.tsx`, `ui/checkbox.tsx`)에서만 쓰이고, `@hookform/resolvers`는 import가 없다. 폼 기능이 없으므로 의존성과 해당 ui 파일을 함께 정리할지 사용자 결정이 필요하다
+- [ ] **결정 필요 — 발행일(Published) 정책**: 현재는 `Published`가 미래 날짜여도 `게시됨`이면 노출된다(테스트제목2는 초안이라 비노출). 미래 날짜 글을 숨길지(예약 게시) 그대로 노출할지 사용자 결정 후 `posts.ts` 필터에 반영- [ ] Notion 블록 타입 검증(콜아웃·토글·임베드·child_page)과 부모 DB 검사 분기 확인 (Shrimp P3-6, 사용자가 테스트 글에 블록을 추가해야 함. 이미지·표·코드 블록은 확인됨)
 - [ ] Vercel 배포: 프로젝트 연결, `NOTION_API_KEY`, `NOTION_DATABASE_ID` 환경 변수 등록
 
 ### 완료 기준
