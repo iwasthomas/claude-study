@@ -11,7 +11,7 @@ Notion에서 `Status`를 `게시됨`으로 바꾸기만 하면 코드 수정·�
 | 단계 | 이름           | 한 줄 요약                                       | 예상 소요 | 상태    |
 | ---- | -------------- | ------------------------------------------------ | --------- | ------- |
 | 1    | 프로젝트 골격  | 구조·환경 설정·외부 서비스(Notion) 준비          | 0.5~1일   | ✅ 완료 |
-| 2    | 공통 모듈      | 타입·Notion 클라이언트·데이터 계층·공통 UI       | 2~3일     | ⏳ 대기 |
+| 2    | 공통 모듈      | 타입·Notion 클라이언트·데이터 계층·공통 UI       | 2~3일     | ✅ 완료 |
 | 3    | 핵심 기능      | 글 목록(홈) + 글 상세 (블로그의 존재 이유)       | 1~2일     | ⏳ 대기 |
 | 4    | 추가 기능      | 카테고리 필터링 (MVP 포함 확정), 검색은 MVP 이후 | 1~1.5일   | ⏳ 대기 |
 | 5    | 최적화 및 배포 | 반응형·다크모드 점검, 본문 스타일, 성능, Vercel  | 1~2일     | ⏳ 대기 |
@@ -20,12 +20,17 @@ Notion에서 `Status`를 `게시됨`으로 바꾸기만 하면 코드 수정·�
 
 ## 결정 현황 (PRD 13절)
 
-| ID  | 결정 사항                               | 상태                                                           | 결정 시점 |
-| --- | --------------------------------------- | -------------------------------------------------------------- | --------- |
-| D-1 | 카테고리 필터링(FR-006)의 MVP 포함 여부 | ✅ **MVP에 포함**                                              | 완료      |
-| D-2 | 글 상세 경로 식별자                     | ✅ **Notion `id` 사용** (Slug 속성 없음)                       | 완료      |
-| D-3 | 본문 블록 렌더링 방식                   | ✅ **`notion-to-md` + Markdown 렌더러** (렌더러 패키지는 미정) | 완료      |
-| D-4 | 캐싱/재검증 주기                        | ⚠️ **결정 필요**                                               | 2단계     |
+| ID  | 결정 사항                               | 상태                                                    | 결정 시점 |
+| --- | --------------------------------------- | ------------------------------------------------------- | --------- |
+| D-1 | 카테고리 필터링(FR-006)의 MVP 포함 여부 | ✅ **MVP에 포함**                                       | 완료      |
+| D-2 | 글 상세 경로 식별자                     | ✅ **Notion `id` 사용** (Slug 속성 없음)                | 완료      |
+| D-3 | 본문 블록 렌더링 방식                   | ✅ **`notion-to-md` + Markdown 렌더러** (렌더러는 D-5)  | 완료      |
+| D-4 | 캐싱/재검증 주기                        | ✅ **목록 ISR 5분 + 글 상세 동적 렌더링**               | 완료      |
+| D-5 | Markdown 렌더러 패키지                  | ✅ **react-markdown + remark-gfm + rehype-pretty-code** | 완료      |
+
+**D-4 근거**: Notion 호스팅 이미지 URL은 S3 서명 URL(`X-Amz-Expires=3600`)이라 1시간 뒤 만료된다. 시간 기반 캐시는 방문이 뜸하면 만료된 URL이 담긴 캐시를 첫 방문자에게 먼저 보여 줄 수 있으므로, 이미지가 없는 목록(홈·카테고리)만 `revalidate = 300`으로 캐시하고 이미지가 있는 글 상세는 요청마다 Notion을 조회한다. 게시 후 목록 반영은 최대 5분이다.
+
+**D-5 근거**: `react-markdown` 10.1.0은 React 19(`react >=18`)와 호환된다. 코드 하이라이트는 `rehype-pretty-code`(shiki)로 서버에서 처리해 클라이언트 JS를 늘리지 않고, 라이트/다크 듀얼 테마로 다크모드(FR-005)를 맞춘다. `notion-to-md`가 코드 펜스 언어를 `plain text`(공백 포함)로 내보내므로 렌더러에서 언어 정규화가 필요하고, 이미지 alt는 캡션이 없으면 URL 인코딩된 파일명이 나오므로 디코딩하거나 비운다.
 
 ---
 
@@ -69,27 +74,26 @@ Notion에서 `Status`를 `게시됨`으로 바꾸기만 하면 코드 수정·�
 
 **데이터 모듈**
 
-- [ ] 도메인 타입·Zod 스키마: `src/lib/schemas/post.ts` (`id, title, category, tags, published, status`, slug 필드 없음), `PostSummary`(목록)·`PostDetail`(본문은 Markdown 문자열) 구분
-- [ ] 서버 전용 Notion 클라이언트: `src/lib/notion/client.ts` (`import 'server-only'` + `env` 사용)
-- [ ] 데이터 계층: `src/lib/notion/posts.ts` — `getPublishedPosts`(게시됨 필터 + 발행일 내림차순 + `has_more` 페이지네이션), `getPostById`(초안·없는 글은 `null`), `getPostsByCategory`
-- [ ] 응답 변환·검증: `src/lib/notion/mapper.ts` (Zod 검증 실패 글은 제외하고 서버 로그에 경고)
-- [ ] 본문 변환: `notion-to-md`로 블록을 Markdown으로 변환 (하위 블록·페이지네이션 포함)
-- [ ] ⚠️ **D-4 결정**: 캐싱/재검증 방식(시간 기반 ISR / 태그 기반 `revalidateTag` / 동적 렌더링)과 주기 결정. Notion 이미지 URL은 일정 시간 후 만료되므로 재검증 주기와 함께 판단
+- [x] 도메인 타입·Zod 스키마: `src/lib/schemas/post.ts` (`id, title, category, tags, published, status`, slug 필드 없음), `PostSummary`(목록)·`PostDetail`(본문은 Markdown 문자열) 구분
+- [x] 서버 전용 Notion 클라이언트: `src/lib/notion/client.ts` (`import 'server-only'` + `env` 사용)
+- [x] 데이터 계층: `src/lib/notion/posts.ts` — `getPublishedPosts`(게시됨 필터 + 발행일 내림차순 + `has_more` 페이지네이션), `getPostById`(초안·없는 글은 `null`), `getPostsByCategory`
+- [x] 응답 변환·검증: `src/lib/notion/mapper.ts` (Zod 검증 실패 글은 제외하고 서버 로그에 경고)
+- [x] 본문 변환: `notion-to-md`로 블록을 Markdown으로 변환 (하위 블록·페이지네이션 포함)
+- [x] **D-4 결정**: 목록 ISR 5분 + 글 상세 동적 렌더링 (Notion 이미지 URL 1시간 만료 근거, 위 결정 현황 참고). 실제 적용은 3단계 홈·상세 구현 때 `revalidate`/`dynamic` 설정으로 한다
 
 **공통 UI 모듈**
 
-- [ ] 더미 데이터: `src/lib/dummy-posts.ts` (타입 만족, 초안 포함) — Notion 연동 전 UI 확인용
-- [ ] 글 카드·메타·목록·빈 상태: `src/components/posts/{post-card,post-meta,post-list,empty-state}.tsx` (기존 shadcn `Card`, `Badge`, `Skeleton` 재사용, 발행일 표기 통일)
-- [ ] 본문 렌더러: `src/components/posts/post-body.tsx` — Markdown 렌더러 패키지 선정(설치 시점의 최신 버전과 React 19 호환 확인), 코드 블록 하이라이트·미지원 블록 처리 방침 기록
-- [ ] 공통 상태 화면 다듬기: `not-found.tsx`, `error.tsx`, `loading.tsx`의 문구·스타일
+- [x] 더미 데이터: `src/lib/dummy-posts.ts` (타입 만족, 초안 포함) — Notion 연동 전 UI 확인용
+- [x] 글 카드·메타·목록·빈 상태: `src/components/posts/{post-card,post-meta,post-list,empty-state}.tsx` (기존 shadcn `Card`, `Badge`, `Skeleton` 재사용, 발행일 표기 통일)
+- [x] 본문 렌더러: `src/components/posts/post-body.tsx` — Markdown 렌더러 패키지 선정(설치 시점의 최신 버전과 React 19 호환 확인), 코드 블록 하이라이트·미지원 블록 처리 방침 기록. 코드는 서버에서 shiki(rehype-pretty-code, github-light/dark 듀얼 테마)로 하이라이트하고 `plain text`·미지원 언어는 `text`로 정규화한다. 원시 HTML은 비허용이라 콜아웃·토글·임베드 등 Markdown으로 표현되지 않는 블록은 일반 텍스트로 나오거나 생략된다
 
 ### 완료 기준
 
-- [ ] `npm run check-all`, `npm run build` 통과
-- [ ] 데이터 계층 호출 시 초안 글이 제외되고 발행일 내림차순으로 반환됨 (임시 서버 코드 또는 로그로 확인)
-- [ ] 모든 Notion 접근 코드가 `server-only`이고 클라이언트 컴포넌트에서 import되지 않음
-- [ ] 더미 데이터로 카드·빈 상태·Skeleton·본문(Markdown) 컴포넌트가 화면에 정상 표시됨
-- [ ] D-4 결정과 근거가 이 문서에 기록됨
+- [x] `npm run check-all`, `npm run build` 통과
+- [x] 데이터 계층 호출 시 초안 글이 제외되고 발행일 내림차순으로 반환됨 (임시 서버 코드 또는 로그로 확인)
+- [x] 모든 Notion 접근 코드가 `server-only`이고 클라이언트 컴포넌트에서 import되지 않음
+- [x] 더미 데이터로 카드·빈 상태·Skeleton·본문(Markdown) 컴포넌트가 화면에 정상 표시됨
+- [x] D-4 결정과 근거가 이 문서에 기록됨
 
 ---
 
@@ -107,6 +111,7 @@ Notion에서 `Status`를 `게시됨`으로 바꾸기만 하면 코드 수정·�
 - [ ] 글 상세 (FR-001, FR-003): 제목·카테고리·태그·발행일·본문 표시, 없는 글·초안 글은 `notFound()`, `generateMetadata`로 글 제목을 `<title>`에 반영
 - [ ] 이미지 처리: 원격 이미지 도메인(`next.config.ts`) 설정, 이미지 URL 만료 대응 확인
 - [ ] 오류 처리: Notion 호출 실패 시 `error.tsx` 표시, 서버 프로세스 유지
+- [ ] 공통 상태 화면 다듬기 (2단계에서 이월): `not-found.tsx`, `error.tsx`, `loading.tsx`의 문구·스타일을 실데이터 화면 기준으로 정리
 
 ### 완료 기준
 
