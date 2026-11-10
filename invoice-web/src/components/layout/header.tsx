@@ -1,11 +1,16 @@
 'use client'
 
 import { useState } from 'react'
-import { useMediaQuery } from 'usehooks-ts'
 import { Menu } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet'
 import { MainNav } from '@/components/navigation/main-nav'
 import { MobileNav } from '@/components/navigation/mobile-nav'
 import { Container } from './container'
@@ -13,7 +18,6 @@ import { ThemeToggle } from '@/components/theme-toggle'
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const isMobile = useMediaQuery('(max-width: 768px)')
 
   return (
     <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
@@ -25,23 +29,18 @@ export function Header() {
               <span className="text-xl font-bold">개발 블로그</span>
             </Link>
 
-            {/* Desktop Navigation */}
-            {!isMobile && <MainNav />}
+            {/* Desktop Navigation: JS 대신 CSS로 분기해 서버/클라이언트 렌더 불일치를 막는다 */}
+            <div className="hidden md:block">
+              <MainNav />
+            </div>
           </div>
 
           {/* Right Side */}
           <div className="flex items-center gap-4">
-            {!isMobile && (
-              <Link href="/login">
-                <Button variant="outline" size="sm">
-                  로그인
-                </Button>
-              </Link>
-            )}
             <ThemeToggle />
 
             {/* Mobile Menu Button */}
-            {isMobile && (
+            <div className="md:hidden">
               <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
                 <SheetTrigger asChild>
                   <Button variant="ghost" size="icon">
@@ -50,10 +49,15 @@ export function Header() {
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+                  {/* Radix Dialog 접근성 요구사항: 화면에는 보이지 않는 제목·설명 */}
+                  <SheetTitle className="sr-only">사이트 메뉴</SheetTitle>
+                  <SheetDescription className="sr-only">
+                    사이트 내 이동 메뉴입니다.
+                  </SheetDescription>
                   <MobileNav onClose={() => setMobileMenuOpen(false)} />
                 </SheetContent>
               </Sheet>
-            )}
+            </div>
           </div>
         </div>
       </Container>
