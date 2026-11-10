@@ -18,6 +18,13 @@ type SelectEqualsFilter = {
 // 공개 대상 글의 Status 값 (PRD 6절)
 const PUBLISHED_STATUS = '게시됨'
 
+// 한국 시간(KST) 기준 오늘 날짜 (YYYY-MM-DD). 발행일이 오늘 이전인 글만 공개한다 (미래 날짜 글은 예약 게시로 숨김)
+function todayInSeoul(): string {
+  return new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Seoul' }).format(
+    new Date()
+  )
+}
+
 // 하이픈 유무·대소문자 차이를 무시하고 Notion ID를 비교하기 위한 정규화
 function normalizeId(id: string): string {
   return id.replace(/-/g, '').toLowerCase()
@@ -54,6 +61,7 @@ async function queryPublishedPosts(
   const filter = {
     and: [
       { property: 'Status', select: { equals: PUBLISHED_STATUS } },
+      { property: 'Published', date: { on_or_before: todayInSeoul() } },
       ...extraFilters,
     ],
   }
@@ -136,6 +144,8 @@ export async function getPostById(id: string): Promise<PostDetail | null> {
 
   const summary = mapPageToSummary(page)
   if (!summary || summary.status !== PUBLISHED_STATUS) return null
+  // 미래 날짜 글은 직접 URL로도 접근할 수 없다 (YYYY-MM-DD 문자열은 사전순 비교로 날짜 비교 가능)
+  if (summary.published.slice(0, 10) > todayInSeoul()) return null
 
   // 하위 블록과 100개 초과 블록 페이지네이션은 notion-to-md가 처리한다
   const n2m = new NotionToMarkdown({ notionClient: notion })
