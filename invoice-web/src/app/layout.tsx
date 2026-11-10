@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: '개발 블로그',
+  title: { default: '개발 블로그', template: '%s | 개발 블로그' },
   description: 'Notion에서 글을 쓰면 자동으로 반영되는 개인 기술 블로그',
 }
 
