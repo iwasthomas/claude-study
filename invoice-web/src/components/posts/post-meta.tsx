@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { formatDate } from '@/components/posts/format-date'
@@ -8,6 +10,8 @@ interface PostMetaProps {
   category: PostSummary['category']
   published: PostSummary['published']
   tags?: PostSummary['tags']
+  // true면 카테고리 Badge가 /category/{이름} 링크가 됨 (상세 페이지용)
+  linkCategory?: boolean
   className?: string
 }
 
@@ -15,13 +19,22 @@ export function PostMeta({
   category,
   published,
   tags = [],
+  linkCategory = false,
   className,
 }: PostMetaProps) {
   return (
     <div className={cn('flex flex-col gap-2', className)}>
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-        {/* TODO: 4단계에서 /category/[name] 링크로 전환 (Badge asChild + Link) */}
-        <Badge variant="secondary">{category}</Badge>
+        {/* 카드 전체가 링크라 카드 안에서는 링크 중첩(<a> 안의 <a>)을 피해 linkCategory=false */}
+        {linkCategory ? (
+          <Badge asChild variant="secondary">
+            <Link href={`/category/${encodeURIComponent(category)}`}>
+              {category}
+            </Link>
+          </Badge>
+        ) : (
+          <Badge variant="secondary">{category}</Badge>
+        )}
         <time dateTime={published} className="text-muted-foreground text-sm">
           {formatDate(published)}
         </time>

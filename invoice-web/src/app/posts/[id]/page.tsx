@@ -50,6 +50,7 @@ export default async function PostPage({ params }: PostPageProps) {
             </h1>
             <PostMeta
               className="mt-4"
+              linkCategory
               category={post.category}
               published={post.published}
               tags={post.tags}
