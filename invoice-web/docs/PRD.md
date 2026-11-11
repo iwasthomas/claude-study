@@ -134,6 +134,6 @@ export const postSchema = z.object({
 
 ## 13. 미결정 사항
 
-1. 캐싱/재검증 주기
+(없음: 캐싱/재검증 주기는 목록 ISR 60초 + 상세 동적 렌더링으로 확정, ROADMAP D-4 참고)
 
 확정된 결정: 카테고리 필터링(FR-006) MVP 포함, 글 상세 경로는 `id` 사용, 본문 렌더링은 `notion-to-md` + Markdown 렌더러.
